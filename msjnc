@@ -58,6 +58,8 @@ use Gtk2;
 use Gtk2::SimpleMenu;
 use Gtk2::Pango;
 
+use IO::Prompt;
+
 # For debug
 use Data::Dumper;
 
@@ -2011,18 +2013,7 @@ sub get_one_passwd_tty {
     my $prompt = shift;
 
     # Get the new password
-    $SIG{'INT'} = 'IGNORE';
-    system(qw(stty -echo));
-    $? == 0 or die "Cannot disable character printing.\n";
-    print "$prompt: ";
-    my $pwd = <STDIN>;
-    print "\n";
-    system(qw(stty echo));
-    $SIG{'INT'} = 'DEFAULT';
-    $? == 0 or die "Cannot enable character printing.\n";
-    $pwd =~ /^(.*)$/;
-    $1 or die "No password provided.  Stop.\n";
-    return $1;
+    return prompt($prompt, -e => '*');
 }
 
 sub get_passwd_tty {
